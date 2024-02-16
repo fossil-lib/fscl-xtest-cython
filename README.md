@@ -1,6 +1,8 @@
-# Project Template README
+# Fossil XTest - **Cython**
 
-Welcome to the **Project Template** repository! This README provides user-friendly instructions for setting up, compiling, testing, and running a project using the Meson build system on Windows, macOS, and Linux systems. Please note that the Meson build system is required for successfully building this project.
+Fossil Standard Component Libraries (FSCL) by Fossil Logic represent the pinnacle of software development, embodying our commitment to quality, security, and practicality. These meticulously curated libraries serve as the cornerstone for crafting cutting-edge applications, offering a foundation built on excellence in code. With FSCL, Fossil Logic empowers developers to seamlessly integrate standardized components that elevate the overall performance and reliability of digital solutions, setting a new standard for software excellence.
+
+Fossil XTest is your go-to library for robust and comprehensive testing solutions. Elevate the quality of your software by incorporating advanced testing methodologies, ensuring that your code not only meets but exceeds industry standards. With Fossil XTest, testing becomes an integral part of your development process, providing confidence in the reliability and functionality of your applications.
 
 ## Who is This For?
 
@@ -28,21 +30,21 @@ Create a directory named subprojects in the root directory, next create a file n
    #  FSCL Wrap File. #
    # ================ #
    [wrap-git]
-   url = https://github.com/fossil-lib/fscl-<name>-c.git
+   url = https://github.com/fossil-lib/fscl-xtest-cython.git
    revision = main
    
    [provide]
-   fscl-x<name>-c = fscl_x<name>_c_dep
+   fscl-xtest-cython = fscl_xtest_cython_dep
    ```
 
 2. **Integrate Wrap File in Meson Build**:
    ```meson
-   project('my_project', 'c',
+   project('my_project', 'cython',
        version : '0.1',
        default_options : ['warning_level=3'])
 
-   exe = executable('my_project', 'my_project.c',
-       dependencies : dependency('fscl-x<name>-c'), # add this line
+   exe = executable('my_project', 'my_project.pyx',
+       dependencies : dependency('fscl-xtest-cython'), # add this line
        install : true)
 
    test('basic', exe)
@@ -68,15 +70,15 @@ meson setup builddir -Dwith_test=enabled
 
 ## Contributing
 
-If you're interested in contributing to this project, please consider opening pull requests or creating issues on the [GitHub repository](https://github.com/dreamer-coding-555/meson-lib-c).
+If you're interested in contributing to this project, please consider opening pull requests or creating issues on the [GitHub repository](https://github.com/fossil-lib/fscl-xtest-cython).
 
 ## Feedback and Support
 
-If you encounter any issues, have questions, or would like to provide feedback, don't hesitate to open an issue on the [GitHub repository](https://github.com/dreamer-coding-555/meson-lib-c/issues).
+If you encounter any issues, have questions, or would like to provide feedback, don't hesitate to open an issue on the [GitHub repository](https://github.com/fossil-lib/fscl-xtest-cython/issues).
 
 ## License
 
-This project is licensed under the [Apache License 2.0](LICENSE).
+This project is licensed under the [Mozilla Public License](LICENSE).
 
 ---
 
