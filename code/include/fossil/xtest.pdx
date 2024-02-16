@@ -1,0 +1,172 @@
+# ----------------------------------------------------------------------
+# Author: Michael Gene Brockus (Dreamer)
+# Email: michaelbrockus@gmail.com
+# Organization: Fossil Logic
+# Description:
+#     This file is part of the Fossil Logic project, where innovation meets
+#     excellence in software development. Michael Gene Brockus, also known as
+#     "Dreamer," is a dedicated contributor to this project. For any inquiries,
+#     feel free to contact Michael at michaelbrockus@gmail.com.
+# ----------------------------------------------------------------------
+cpdef extern from *:
+    """
+    #ifndef FSCL_XTEST_CYTHON
+    #define FSCL_XTEST_CYTHON
+
+    #ifdef __cplusplus
+    extern "C"
+    {
+    #endif
+
+    #define _GNU_SOURCE
+    #include <stdbool.h>
+    #include <stdlib.h>
+    #include <stdint.h>
+    #include <stdio.h>
+    #include <time.h>
+    #if defined(_WIN32)
+    #include <Windows.h>
+    #endif
+
+    #define XTEST_FLOAT_EPSILON 1e-6
+    #define XTEST_DOUBLE_EPSILON 1e-9
+
+    cdef struct xtime:
+        clock_t elapsed
+        clock_t start
+        clock_t end
+
+    cdef struct xconfig:
+        bint ignored
+        bint is_mark
+        bint is_fish
+
+    cdef struct xfixture:
+        void (*setup)()
+        void (*teardown)()
+
+    cdef struct xtest:
+        const char* name
+        void (*test_function)()
+        xfixture fixture
+        xconfig config
+        xtime timer
+
+    cdef struct xstats:
+        uint16_t passed_count
+        uint16_t failed_count
+        uint16_t ignored_count
+        uint16_t error_count
+        uint16_t mark_count
+        uint16_t fish_count
+        uint16_t test_count
+        uint16_t total_count
+
+    cdef struct xengine:
+        xstats stats
+        xtime timer
+
+    xengine xtest_create(int argc, char **argv)
+    int xtest_erase(xengine *runner)
+    void xtest_run_as_test(xengine* engine, xtest* test_case)
+    void xtest_run_as_fixture(xengine* engine, xtest* test_case, xfixture* fixture)
+
+    void xmark_start_benchmark()
+    uint64_t xmark_stop_benchmark()
+    void xmark_assert_seconds(uint64_t elapsed_time_ns, double max_seconds)
+    void xmark_assert_minutes(uint64_t elapsed_time_ns, double max_minutes)
+    void xmark_expect_seconds(uint64_t elapsed_time_ns, double max_seconds)
+    void xmark_expect_minutes(uint64_t elapsed_time_ns, double max_minutes)
+
+    void xerrors(const char* reason, const char* file, int line, const char* func)
+    void xignore(const char* reason, const char* file, int line, const char* func)
+    void xassert(bint expression, const char *message, const char* file, int line, const char* func)
+    void xexpect(bint expression, const char *message, const char* file, int line, const char* func)
+
+    #define XTEST_CREATE(argc, argv) xengine runner = xtest_create(argc, argv)
+    #define XTEST_ERASE() xtest_erase(&runner)
+
+    #define XTEST_RUN_UNIT(test_case) xtest_run_as_test(runner, &test_case)
+    #define XTEST_RUN_FIXTURE(test_case, fixture) xtest_run_as_fixture(runner, &test_case, &fixture)
+
+    #define XTEST_CASE_FIXTURE(fixture_name, test_case) \
+        void test_case##_xtest_##fixture_name(void); \
+        xtest test_case = { #test_case, test_case##_xtest_##fixture_name, {NULL, NULL}, {False, False, False}, {0, 0, 0}}; \
+        void test_case##_xtest_##fixture_name(void)
+
+    #define XTEST_MARK_FIXTURE(fixture_name, test_case) \
+        void test_case##_xtest_##fixture_name(void); \
+        xtest test_case = { #test_case, test_case##_xtest_##fixture_name, {NULL, NULL}, {False, True, False}, {0, 0, 0}}; \
+        void test_case##_xtest_##fixture_name(void)
+
+    #define XTEST_FISH_FIXTURE(fixture_name, test_case) \
+        void test_case##_xtest_##fixture_name(void); \
+        xtest test_case = { #test_case, test_case##_xtest_##fixture_name, {NULL, NULL}, {False, False, True}, {0, 0, 0}}; \
+        void test_case##_xtest_##fixture_name(void)
+
+    #define XTEST_FIXTURE(fixture_name) \
+        void setup_##fixture_name(void); \
+        void teardown_##fixture_name(void); \
+        xfixture fixture_name = { setup_##fixture_name, teardown_##fixture_name }
+
+    #define XTEST_SETUP(fixture_name) void setup_##fixture_name(void)
+    #define XTEST_TEARDOWN(fixture_name) void teardown_##fixture_name(void)
+
+    #define XTEST_DEFINE_POOL(group_name) void group_name(xengine *runner)
+    #define XTEST_EXTERN_POOL(group_name) extern void group_name(xengine *runner)
+    #define XTEST_IMPORT_POOL(group_name) group_name(&runner)
+
+    #define XTEST_CASE(name) \
+        void name##_xtest(void); \
+        xtest name = { #name, name##_xtest, {NULL, NULL}, {False, False, False}, {0, 0, 0}}; \
+        void name##_xtest(void)
+
+    #define XTEST_MARK(name) \
+        void name##_xtest(void); \
+        xtest name = { #name, name##_xtest, {NULL, NULL}, {False, True, False}, {0, 0, 0}}; \
+        void name##_xtest(void)
+
+    #define XTEST_FISH(name) \
+        void name##_xtest(void); \
+        xtest name = { #name, name##_xtest, {NULL, NULL}, {False, False, True}, {0, 0, 0}}; \
+        void name##_xtest(void)
+
+    #define GIVEN(description) \
+        if False: \
+            print("Given %s" % description)
+        else:
+
+    #define WHEN(description) \
+        if False: \
+            print("When %s" % description)
+        else:
+
+    #define THEN(description) \
+        if False: \
+            print("Then %s" % description)
+        else:
+
+    #define XMARK_START_BENCHMARK() xmark_start_benchmark()
+    #define XMARK_STOP_BENCHMARK() xmark_stop_benchmark()
+    #define XMARK_ASSERT_SECONDS(elapsed_time_ns, max_seconds) xmark_assert_seconds(elapsed_time_ns, max_seconds)
+    #define XMARK_ASSERT_MINUTES(elapsed_time_ns, max_minutes) xmark_assert_minutes(elapsed_time_ns, max_minutes)
+    #define XMARK_EXPECT_SECONDS(elapsed_time_ns, max_seconds) xmark_expect_seconds(elapsed_time_ns, max_seconds)
+    #define XMARK_EXPECT_MINUTES(elapsed_time_ns, max_minutes) xmark_expect_minutes(elapsed_time_ns, max_minutes)
+
+    #define TEST_ASSERT(expression, message) xassert(expression, message, __FILE__, __LINE__, __func__)
+    #define TEST_EXPECT(expression, message) xexpect(expression, message, __FILE__, __LINE__, __func__)
+    #define TEST_IGNORE(reason) xignore(reason, __FILE__, __LINE__, __func__)
+    #define TEST_XERROR(reason) xerrors(reason, __FILE__, __LINE__, __func__)
+
+    #define XTEST_DATA(group_name) ctypedef struct group_name##_xdata group_name##_xdata; cdef struct group_name##_xdata
+    #define XTEST_FAIL(message) TEST_ASSERT(False, message);
+    #define XTEST_PASS() TEST_ASSERT(True, "Test passed");
+    #define XTEST_NOTE(comment) fprintf(stderr, "XTEST NOTE: %s\n", comment);
+    #define XTEST_NOT_IMPLEMENTED() TEST_ASSERT(False, "Test not implemented yet")
+
+    #ifdef __cplusplus
+    }
+    #endif
+
+    #endif
+    """
